@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todos Fit</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js">
+  function buscarDireccionManual() {
+    const direccion = document.getElementById("direccionManual").value;
+    const lista = document.getElementById("listaTiendas");
+    if (direccion.trim()) {
+      lista.innerHTML += `
+        <div class="bg-gray-100 p-4 rounded shadow">
+          <h3 class="font-semibold text-xl">Tienda cercana a "${direccion}"</h3>
+          <p>Suplementos y ropa deportiva</p>
+          <a href="#" class="bg-green-600 text-white px-4 py-2 rounded mt-2 inline-block">Comprar ahora</a>
+        </div>`;
+    }
+  }
+let carrito = [];
+
+function agregarAlCarrito(producto, cantidad) {
+  cantidad = parseInt(cantidad);
+  if (!cantidad || cantidad <= 0) return;
+
+  const existente = carrito.find(p => p.nombre === producto);
+  if (existente) {
+    existente.cantidad += cantidad;
+  } else {
+    carrito.push({ nombre: producto, cantidad });
+  }
+  actualizarCarrito();
+  mostrarNotificacion();
+  const audio = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_d0b1a34a4f.mp3');
+  audio.play();
+}
+
+function actualizarCarrito() {
+  const contador = document.getElementById("contadorCarrito");
+  const contenedor = document.getElementById("itemsCarrito");
+  const totalSpan = document.getElementById("totalCarrito");
+  const panel = document.getElementById("carrito");
+
+  contenedor.innerHTML = "";
+  let total = 0;
+  carrito.forEach((item, index) => {
+    const precio = parseInt(item.nombre.split("$")[1].replace(".", ""));
+    total += item.cantidad * precio;
+    contenedor.innerHTML += `
+      <div class='text-sm flex justify-between items-center mb-1'>
+        <span>${item.nombre}</span>
+        <div class='flex items-center gap-1'>
+          <input type='number' value='${item.cantidad}' min='1' class='w-12 text-center border rounded' onchange='cambiarCantidad(${index}, this.value)' />
+          <button onclick='eliminarDelCarrito(${index})' class='text-red-600 text-xs ml-1'>✖</button>
+        </div>
+      </div>`;
+  });
+
+  totalSpan.innerText = "$" + total.toLocaleString();
+  panel.classList.remove("hidden");
+  contador.textContent = carrito.reduce((acc, p) => acc + p.cantidad, 0);
+  document.getElementById("contadorCarrito").textContent = carrito.reduce((acc, p) => acc + p.cantidad, 0);
+}
+}
+
+function finalizarCompra() {
+  const direccion = document.getElementById("direccionEnvio").value;
+  if (carrito.length === 0) {
+    alert("Tu carrito está vacío. Agrega productos antes de pagar.");
+    return;
+  }
+  if (!direccion) {
+    alert("Por favor ingresa una dirección de envío");
+    return;
+  }
+  alert("¡Gracias por tu compra! Tu pedido será enviado a: " + direccion);
+  carrito = [];
+  actualizarCarrito();
+  document.getElementById("carrito").classList.add("hidden");
+}
+}
+}
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous">function cambiarCantidad(index, nuevaCantidad) {
+  nuevaCantidad = parseInt(nuevaCantidad);
+  if (nuevaCantidad > 0) {
+    carrito[index].cantidad = nuevaCantidad;
+    actualizarCarrito();
+  }
+}
+
+function eliminarDelCarrito(index) {
+  carrito.splice(index, 1);
+  actualizarCarrito();
+}
+function toggleCarrito() {
+  const carrito = document.getElementById("carrito");
+  carrito.classList.toggle("hidden");
+}
+function mostrarNotificacion() {
+  const noti = document.getElementById("notificacion");
+  noti.style.display = "block";
+  setTimeout(() => {
+    noti.style.display = "none";
+  }, 2000);
+}
+</script>
+  <style>
+    body {
+      background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b');
+      background-size: cover;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+    .bg-white, .bg-gray-100, .bg-green-100 {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.7);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 720px;
+      border-radius: 10px;
+    }
+  </style>
+<style>
+  #notificacion {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    background-color: #38a169;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 9999;
+    animation: fadeInOut 2s ease-in-out;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(10px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(10px); }
+  }
+</style>
+</head>
+<body class="text-gray-800">
+  <header class="bg-green-600 text-white text-center py-6 shadow-lg" data-aos="fade-down">
+    <h1 class="text-4xl font-bold">Todos Fit</h1>
+    <p class="text-lg">Todo en un solo lugar, deporte, tiendas y eventos</p>
+  </header>
+
+  <nav class="bg-green-700 text-white flex justify-center space-x-6 py-4 shadow-md" data-aos="fade-down" data-aos-delay="100">
+    <button onclick="mostrarSeccion('inicio')" class="hover:underline">Inicio</button>
+    <button onclick="mostrarSeccion('entrenamiento')" class="hover:underline">Entrenamiento</button>
+    <button onclick="mostrarSeccion('rutinas')" class="hover:underline">Rutinas</button>
+    <button onclick="mostrarSeccion('profesores')" class="hover:underline">Profesores</button>
+    <button onclick="mostrarSeccion('tiendas')" class="hover:underline">Tiendas</button>
+    <button onclick="mostrarSeccion('comunidad')" class="hover:underline">Comunidad</button>
+    <button onclick="mostrarSeccion('registro')" class="hover:underline">Ingresar / Registrarse</button>
+  </nav>
+
+  <main id="contenido">
+    <section id="inicio" class="seccion p-8 text-center bg-white rounded-lg shadow m-6">
+      <h2 class="text-3xl font-semibold mb-4">Bienvenido a Todos Fit</h2>
+      <p class="text-lg mb-4">Conecta con tu bienestar total: accede a entrenamientos, nutrición, comunidad, tiendas y más en un solo lugar.</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <button onclick="mostrarSeccion('entrenamiento')" class="bg-green-600 text-white px-4 py-2 rounded">Ver Entrenamientos</button>
+        <button onclick="mostrarSeccion('rutinas')" class="bg-green-600 text-white px-4 py-2 rounded">Rutinas</button>
+        <button onclick="mostrarSeccion('tiendas')" class="bg-green-600 text-white px-4 py-2 rounded">Tiendas</button>
+        <button onclick="mostrarSeccion('comunidad')" class="bg-green-600 text-white px-4 py-2 rounded">Comunidad</button>
+      </div>
+    </section>
+
+    <section id="entrenamiento" class="seccion p-8 bg-white rounded-lg shadow m-6 hidden">
+  <h2 class="text-2xl font-bold mb-4">Áreas de Entrenamiento</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <button onclick="mostrarSubEntrenamiento('casa')" class="bg-green-100 p-4 rounded shadow hover:bg-green-200">🏠 En casa</button>
+    <button onclick="mostrarSubEntrenamiento('gimnasio')" class="bg-green-100 p-4 rounded shadow hover:bg-green-200">🏋️ Gimnasio</button>
+    <button onclick="mostrarSubEntrenamiento('airelibre')" class="bg-green-100 p-4 rounded shadow hover:bg-green-200">🌳 Aire libre</button>
+  </div>
+
+  <div id="sub-entrenamiento"></div>
+</section>
+
+<script>
+  function mostrarSubEntrenamiento(zona) {
+    const sub = document.getElementById("sub-entrenamiento");
+    let contenido = '';
+    const rutinas = {
+  casa: [
+    { titulo: "Glúteos", video: "https://www.youtube.com/embed/bQHJ2vgXv7Y" },
+    { titulo: "Piernas", video: "https://www.youtube.com/embed/SasACgGscHg" },
+    { titulo: "Espalda", video: "https://www.youtube.com/embed/VmB1G1K7v94" }
+  ],
+  gimnasio: [
+    { titulo: "Pecho", video: "https://www.youtube.com/embed/eozdVDA78K0" },
+    { titulo: "Bíceps", video: "https://www.youtube.com/embed/ykJmrZ5v0Oo" },
+    { titulo: "Tríceps", video: "https://www.youtube.com/embed/d1dNx7Hl370" }
+  ],
+  airelibre: [
+    { titulo: "Cardio running", video: "https://www.youtube.com/embed/gUXYxFttYyM" },
+    { titulo: "Piernas en parque", video: "https://www.youtube.com/i30nWJeX_7A" },
+    { titulo: "Circuito funcional", video: "https://www.youtube.com/embed/_gwd4q2xoB8" }
+  ]
+};
+    contenido += `<div class='grid grid-cols-1 md:grid-cols-2 gap-4'>`;
+    rutinas[zona].forEach(r => {
+      contenido += `
+        <div onclick=\"mostrarVideo('${r.video}')\" class=\"cursor-pointer bg-gray-100 p-4 rounded shadow hover:bg-gray-200\">
+          <img src='https://img.youtube.com/vi/${r.video.split('/').pop()}/0.jpg' alt='${r.titulo}' class='mb-2 rounded'>
+          <h3 class="font-semibold">${r.titulo}</h3>
+          <p>Haz clic para ver video</p>
+        </div>
+      `;
+    });
+    contenido += '</div>';
+    sub.innerHTML = contenido;
+  }
+</script>
+
+    <section id="rutinas" class="seccion p-8 bg-white rounded-lg shadow m-6 hidden">
+      <h2 class="text-2xl font-bold mb-4">Rutinas</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div onclick="mostrarVideo('https://www.youtube.com/embed/NncmQk5a9Dg')" class="cursor-pointer bg-gray-100 p-4 rounded shadow hover:bg-gray-200">
+          <h3 class="font-semibold">Bajar de peso (Principiante)</h3>
+          <p>Duración: 30 min</p>
+        </div>
+        <div onclick="mostrarVideo('https://www.youtube.com/embed/n8ZhDn90Rso')" class="cursor-pointer bg-gray-100 p-4 rounded shadow hover:bg-gray-200">
+          <h3 class="font-semibold">Ganar masa muscular (Intermedio)</h3>
+          <p>Duración: 45 min</p>
+        </div>
+        <div onclick="mostrarVideo('https://www.youtube.com/embed/oAPCPjnU1wA')" class="cursor-pointer bg-gray-100 p-4 rounded shadow hover:bg-gray-200">
+          <h3 class="font-semibold">Tonificar (Avanzado)</h3>
+          <p>Duración: 60 min</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="profesores" class="seccion p-8 bg-white rounded-lg shadow m-6 hidden">
+      <h2 class="text-2xl font-bold mb-4">Entrenadores Personales</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-green-100 p-4 rounded shadow">
+          <h3 class="font-semibold">Juan Pérez</h3>
+          <p>Hipertrofia - Bogotá</p>
+        </div>
+        <div class="bg-green-100 p-4 rounded shadow">
+          <h3 class="font-semibold">Laura Gómez</h3>
+          <p>Cardio y funcional - Medellín</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="tiendas" class="seccion p-8 bg-white rounded-lg shadow m-6 hidden">
+      <h2 class="text-2xl font-bold mb-4">Tiendas Locales</h2>
+      <button onclick="obtenerUbicacion()" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">Detectar mi ubicación</button>
+      <div class="flex gap-2 mb-4">
+  <input id="direccionManual" placeholder="O escribe tu dirección..." class="p-2 border rounded w-full" />
+  <button onclick="buscarDireccionManual()" class="bg-blue-600 text-white px-4 py-2 rounded">Buscar</button>
+</div>
+      <div id="listaTiendas" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- Tienda de ropa -->
+  <div class="bg-gray-100 p-4 rounded shadow">
+    <img src="https://cdn-icons-png.flaticon.com/512/9471/9471352.png" alt="FitWear logo" class="w-16 h-16 mb-2">
+    <h3 class="font-semibold text-xl">FitWear</h3>
+    <p>Ropa deportiva para hombres y mujeres</p>
+    <a onclick="mostrarTienda('fitwear')" class="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">Ver Tienda</a>
+  </div>
+
+  <!-- Tienda de suplementos -->
+  <div class="bg-gray-100 p-4 rounded shadow">
+    <img src="https://cdn-icons-png.flaticon.com/512/3194/3194745.png" alt="NutriForce logo" class="w-16 h-16 mb-2">
+    <h3 class="font-semibold text-xl">NutriForce</h3>
+    <p>Suplementos y vitaminas</p>
+    <a onclick="mostrarTienda('nutriforce')" class="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded cursor-pointer">Ver Tienda</a>
+  </div>
+</div>
+
+<!-- Panel de tienda expandida -->
+<div id="panelTienda" class="hidden bg-white rounded shadow p-6 mt-6">
+  <button onclick="cerrarTienda()" class="mb-4 bg-red-500 text-white px-4 py-1 rounded">Cerrar Tienda</button>
+  <div id="contenidoTienda"></div>
+</div>
+
+<script>
+  const productos = {
+    fitwear: {
+      nombre: "FitWear",
+      items: [
+        "Camiseta dry-fit - $50.000",
+        "Leggins de compresión - $80.000",
+        "Top deportivo - $60.000",
+        "Sudadera térmica - $120.000",
+        "Pantalón jogger - $90.000",
+        "Chaqueta impermeable - $150.000",
+        "Medias deportivas - $25.000",
+        "Gorra deportiva - $30.000",
+        "Short fitness - $70.000",
+        "Bolso gimnasio - $110.000"
+      ]
+    },
+    nutriforce: {
+      nombre: "NutriForce",
+      items: [
+        "Proteína Whey 2kg - $180.000",
+        "Creatina monohidratada - $90.000",
+        "BCAA cápsulas - $70.000",
+        "Multivitamínico - $40.000",
+        "Omega 3 - $35.000",
+        "Batidos energéticos - $65.000",
+        "Colágeno hidrolizado - $85.000",
+        "Termogénicos - $75.000",
+        "Glutamina - $60.000",
+        "Pre-entreno - $95.000"
+      ]
+    }
+  };
+
+  function mostrarTienda(nombre) {
+  const tienda = productos[nombre];
+  const panel = document.getElementById("panelTienda");
+  const contenido = document.getElementById("contenidoTienda");
+  contenido.innerHTML = `<h2 class='text-2xl font-bold mb-4'>${tienda.nombre}</h2><div class='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>`;
+  tienda.items.forEach((prod, index) => {
+    contenido.innerHTML += `
+      <div class='bg-white border border-gray-300 rounded-lg shadow p-4 flex flex-col items-center'>
+        ${(() => {
+          const imagenes = {
+  'Camiseta': "https://tienda.utp.edu.co/wp-content/uploads/2022/09/JCM5479-Editar.jpg",
+  'Leggins': 'https://i.imgur.com/Ib3uO1S.jpg',
+  'Top': 'https://i.imgur.com/NzE8cAA.jpg',
+  'Sudadera': 'https://i.imgur.com/kWYZwdg.jpg',
+  'Pantalón': 'https://i.imgur.com/Scru6eD.jpg',
+  'Chaqueta': 'https://i.imgur.com/dRVtAbD.jpg',
+  'Medias': 'https://i.imgur.com/L1Qxi3R.jpg',
+  'Gorra': 'https://i.imgur.com/I3acMTV.jpg',
+  'Short': 'https://i.imgur.com/gdhL1Ro.jpg',
+  'Bolso': 'https://i.imgur.com/SI0wzAF.jpg',
+  'Proteína': 'https://i.imgur.com/ONShZQT.jpg',
+  'Creatina': 'https://i.imgur.com/X0YYEkx.jpg',
+  'BCAA': 'https://i.imgur.com/4KOCNPK.jpg',
+  'Multivitamínico': 'https://i.imgur.com/IkJ4bnR.jpg',
+  'Omega': 'https://i.imgur.com/okRej3N.jpg',
+  'Batidos': 'https://i.imgur.com/3EFLSMF.jpg',
+  'Colágeno': 'https://i.imgur.com/Ol4o1bl.jpg',
+  'Termogénicos': 'https://i.imgur.com/X2d2Gnt.jpg',
+  'Glutamina': 'https://i.imgur.com/oCUWyIx.jpg',
+  'Pre-entreno': 'https://i.imgur.com/d3h3MFq.jpg'
+};
+          const nombre = prod.split(' - ')[0];
+          let imagen = 'https://via.placeholder.com/150?text=Producto';
+          Object.keys(imagenes).forEach(key => {
+            if (nombre.toLowerCase().includes(key.toLowerCase())) {
+              imagen = imagenes[key];
+            }
+          });
+          return `<img src='${imagen}' class='w-full h-32 object-contain mb-2 rounded'>`;
+        })()}
+        <p class='text-center mb-2 font-medium'>${prod}</p>
+        <label class='text-sm'>Cantidad:</label>
+        <input type='number' min='1' value='1' id='cantidad-${index}' class='w-16 text-center border rounded mb-2'>
+        <button onclick="agregarAlCarrito('${prod}', document.getElementById('cantidad-${index}').value)" class='bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700'>Agregar al carrito</button>
+      </div>`;
+  });
+  contenido.innerHTML += '</div>';
+  setTimeout(() => {
+    document.querySelectorAll('[id^="cantidad-"]').forEach((input, index) => {
+      input.value = 1;
+      input.addEventListener('input', () => {
+        if (input.value <= 0) input.value = 1;
+      });
+    });
+  }, 0);
+  panel.classList.remove("hidden");
+  }
+
+  function cerrarTienda() {
+    document.getElementById("panelTienda").classList.add("hidden");
+  }
+</script>
+  <div class="bg-gray-100 p-4 rounded shadow">
+    <h3 class="font-semibold text-xl">NutriForce</h3>
+    <p>Suplementos y vitaminas</p>
+    <ul class="list-disc ml-5 mt-2">
+      <li>Proteína Whey 2kg - $180.000</li>
+      <li>Multivitamínico x60 cápsulas - $40.000</li>
+    </ul>
+    <a href="https://www.mercadopago.com.co/" target="_blank" class="inline-block mt-2 bg-blue-600 text-white px-4 py-2 rounded">Comprar en Mercado Pago</a>
+  </div>
+</div>
+    </section>
+
+    <section id="comunidad" class="seccion p-8 bg-white rounded-lg shadow m-6 hidden">
+  <h2 class="text-2xl font-bold mb-4">Comunidad y Eventos</h2>
+  <form id="formEvento" class="mb-6">
+    <input id="nombreEvento" placeholder="Nombre del evento" class="p-2 border rounded w-full mb-2" required />
+    <input id="lugarEvento" placeholder="Lugar del evento" class="p-2 border rounded w-full mb-2" required />
+    <input id="fechaEvento" type="date" class="p-2 border rounded w-full mb-2" required />
+    <input id="horaInicioEvento" type="time" class="p-2 border rounded w-full mb-2" placeholder="Hora de inicio" required />
+    <input id="horaFinEvento" type="time" class="p-2 border rounded w-full mb-2" placeholder="Hora de finalización" required />
+    <textarea id="descripcionEvento" placeholder="Descripción del evento" class="p-2 border rounded w-full mb-2" required></textarea>
+    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Crear Evento</button>
+  </form>
+  <div id="listaEventos" class="space-y-4">
+    <div class="bg-gray-100 p-4 rounded shadow">
+      <h3 class="font-semibold">Caminata al aire libre</h3>
+      <p><strong>Lugar:</strong> Parque Simón Bolívar</p>
+      <p><strong>Fecha:</strong> 2025-04-22</p>
+      <p><strong>Descripción:</strong> Caminata en grupo para todos los niveles. Lleva hidratación.</p>
+      <div class="mt-2 space-x-2">
+        <button class="text-blue-600" onclick="editarEvento(this)">Editar</button>
+        <button class="text-red-600" onclick="eliminarEvento(this)">Eliminar</button>
+      </div>
+    </div>
+    <div class="bg-gray-100 p-4 rounded shadow">
+      <h3 class="font-semibold">Reto de abdominales</h3>
+      <p><strong>Lugar:</strong> Virtual</p>
+      <p><strong>Fecha:</strong> 2025-04-25</p>
+      <p><strong>Descripción:</strong> Reto de 7 días para mejorar tu core desde casa.</p>
+      <div class="mt-2 space-x-2">
+        <button class="text-blue-600" onclick="editarEvento(this)">Editar</button>
+        <button class="text-red-600" onclick="eliminarEvento(this)">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <section id="registro" class="seccion p-8 bg-white rounded-lg shadow m-6 hidden">
+      <h2 class="text-2xl font-bold mb-4">Ingresar / Registrarse</h2>
+      <form class="space-y-4">
+        <div>
+          <label class="block mb-1 font-semibold">Correo:</label>
+          <input type="email" class="w-full p-2 border border-gray-300 rounded" required />
+        </div>
+        <div>
+          <label class="block mb-1 font-semibold">Contraseña:</label>
+          <input type="password" class="w-full p-2 border border-gray-300 rounded" required />
+        </div>
+        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Iniciar Sesión</button>
+      </form>
+    </section>
+  <!-- Carrito flotante -->
+<div id="carrito" class="fixed top-24 right-4 bg-white p-4 shadow-xl rounded-lg w-80 hidden z-50">
+  <h3 class="text-lg font-bold mb-2">🛒 Carrito</h3>
+  <div id="itemsCarrito" class="mb-2 max-h-40 overflow-y-auto"></div>
+  <p class="font-semibold">Total: <span id="totalCarrito">$0</span></p>
+  <input id="direccionEnvio" placeholder="Dirección de envío" class="w-full p-1 border rounded mt-2" />
+  <button onclick="finalizarCompra()" class="mt-2 bg-blue-600 text-white px-4 py-1 rounded">Pagar ahora</button>
+</div>
+<!-- Botón flotante para abrir/cerrar carrito -->
+<button onclick="toggleCarrito()" class="fixed top-20 right-4 bg-green-600 text-white text-xl p-3 rounded-full shadow-lg z-50 hover:bg-green-700">
+  🛒 <span id="contadorCarrito" class="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full ml-1">0</span>
+</button>
+
+<!-- Carrito flotante -->
+<div id="carrito" class="fixed top-24 right-4 bg-white p-4 shadow-xl rounded-lg w-80 hidden z-50">
+  <h3 class="text-lg font-bold mb-2">🛒 Carrito</h3>
+  <div id="itemsCarrito" class="mb-2 max-h-40 overflow-y-auto"></div>
+  <p class="font-semibold">Total: <span id="totalCarrito">$0</span></p>
+  <input id="direccionEnvio" placeholder="Dirección de envío" class="w-full p-1 border rounded mt-2" />
+  <button onclick="finalizarCompra()" class="mt-2 bg-blue-600 text-white px-4 py-1 rounded">Pagar ahora</button>
+</div>
+</main>
+
+  <div id="videoModal" class="modal" onclick="cerrarVideo()">
+    <div class="modal-content">
+      <iframe id="videoFrame" width="100%" height="400" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <footer class="bg-green-600 text-white text-center py-4 w-full fixed bottom-0 left-0">
+  <p>&copy; 2025 Todos Fit. Todos los derechos reservados.</p>
+</footer>
+
+  <script>
+    AOS.init();
+
+    function mostrarSeccion(id) {
+      document.querySelectorAll('.seccion').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function mostrarVideo(url) {
+      const modal = document.getElementById("videoModal");
+      const frame = document.getElementById("videoFrame");
+      frame.src = url;
+      modal.style.display = "block";
+    }
+
+    function cerrarVideo() {
+      const modal = document.getElementById("videoModal");
+      const frame = document.getElementById("videoFrame");
+      frame.src = "";
+      modal.style.display = "none";
+    }
+
+    function obtenerUbicacion() {
+      const lista = document.getElementById("listaTiendas");
+      lista.innerHTML = "<p>Mostrando tiendas cercanas en tu zona...</p>";
+      setTimeout(() => {
+        lista.innerHTML = `
+          <div class="bg-gray-100 p-4 rounded shadow">
+            <h3 class="font-semibold">BodyTech Store</h3>
+            <p>Cra 7 # 52-10, Bogotá</p>
+          </div>
+          <div class="bg-gray-100 p-4 rounded shadow">
+            <h3 class="font-semibold">Healthy Fit</h3>
+            <p>Av. Suba #99-12, Bogotá</p>
+          </div>`;
+      }, 1000);
+    }
+
+    document.getElementById("formEvento").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const nombre = document.getElementById("nombreEvento").value;
+  const lugar = document.getElementById("lugarEvento").value;
+  const fecha = document.getElementById("fechaEvento").value;
+  const horaInicio = document.getElementById("horaInicioEvento").value;
+  const horaFin = document.getElementById("horaFinEvento").value;
+  const descripcion = document.getElementById("descripcionEvento").value;
+  const nuevo = document.createElement("div");
+  nuevo.className = "bg-gray-100 p-4 rounded shadow";
+  nuevo.innerHTML = `
+    <h3 class="font-semibold">${nombre}</h3>
+    <p><strong>Lugar:</strong> ${lugar}</p>
+    <p><strong>Fecha:</strong> ${fecha}</p>
+    <p><strong>Hora:</strong> ${horaInicio} - ${horaFin}</p>
+    <p><strong>Descripción:</strong> ${descripcion}</p>
+    <div class="mt-2 space-x-2">
+      <button class="text-blue-600" onclick="editarEvento(this)">Editar</button>
+      <button class="text-red-600" onclick="eliminarEvento(this)">Eliminar</button>
+    </div>
+  `;
+  document.getElementById("listaEventos").appendChild(nuevo);
+  e.target.reset();
+});
+
+function eliminarEvento(btn) {
+  btn.closest(".bg-gray-100").remove();
+}
+
+function editarEvento(btn) {
+  const card = btn.closest(".bg-gray-100");
+  const nombre = prompt("Nuevo nombre del evento:", card.querySelector("h3").innerText);
+  const lugar = prompt("Nuevo lugar:", card.querySelector("p:nth-of-type(1)").innerText.split(': ')[1]);
+  const fecha = prompt("Nueva fecha:", card.querySelector("p:nth-of-type(2)").innerText.split(': ')[1]);
+  const descripcion = prompt("Nueva descripción:", card.querySelector("p:nth-of-type(3)").innerText.split(': ')[1]);
+  if (nombre && lugar && fecha && descripcion) {
+    card.innerHTML = `
+      <h3 class="font-semibold">${nombre}</h3>
+      <p><strong>Lugar:</strong> ${lugar}</p>
+      <p><strong>Fecha:</strong> ${fecha}</p>
+      <p><strong>Descripción:</strong> ${descripcion}</p>
+      <div class="mt-2 space-x-2">
+        <button class="text-blue-600" onclick="editarEvento(this)">Editar</button>
+        <button class="text-red-600" onclick="eliminarEvento(this)">Eliminar</button>
+      </div>
+    `;
+  }
+}
+  </script>
+<div id="notificacion">✔ Producto agregado al carrito</div>
+<audio id="sonidoCompra" src="https://cdn.pixabay.com/audio/2022/03/02/audio_d7a80e9bfa.mp3"></audio>
+<script>
+let carrito = [];
+
+function agregarAlCarrito(producto, cantidad) {
+  cantidad = parseInt(cantidad);
+  if (!cantidad || cantidad <= 0) return;
+  const existente = carrito.find(p => p.nombre === producto);
+  if (existente) {
+    existente.cantidad += cantidad;
+  } else {
+    carrito.push({ nombre: producto, cantidad });
+  }
+  actualizarCarrito();
+  mostrarNotificacion();
+  const audio = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_d0b1a34a4f.mp3');
+  audio.play();
+}
+
+function actualizarCarrito() {
+  const contador = document.getElementById("contadorCarrito");
+  const contenedor = document.getElementById("itemsCarrito");
+  const totalSpan = document.getElementById("totalCarrito");
+  const panel = document.getElementById("carrito");
+
+  contenedor.innerHTML = "";
+  let total = 0;
+  carrito.forEach((item, index) => {
+    const precio = parseInt(item.nombre.split("$")[1].replace(".", ""));
+    total += item.cantidad * precio;
+    contenedor.innerHTML += `
+      <div class='text-sm flex justify-between items-center mb-1'>
+        <span>${item.nombre}</span>
+        <div class='flex items-center gap-1'>
+          <input type='number' value='${item.cantidad}' min='1' class='w-12 text-center border rounded' onchange='cambiarCantidad(${index}, this.value)' />
+          <button onclick='eliminarDelCarrito(${index})' class='text-red-600 text-xs ml-1'>✖</button>
+        </div>
+      </div>`;
+  });
+
+  totalSpan.innerText = "$" + total.toLocaleString();
+  panel.classList.remove("hidden");
+  contador.textContent = carrito.reduce((acc, p) => acc + p.cantidad, 0);
+}
+
+function finalizarCompra() {
+  const direccion = document.getElementById("direccionEnvio").value;
+  if (carrito.length === 0) {
+    alert("Tu carrito está vacío. Agrega productos antes de pagar.");
+    return;
+  }
+  if (!direccion) {
+    alert("Por favor ingresa una dirección de envío");
+    return;
+  }
+  document.getElementById("sonidoCompra").play();
+  setTimeout(() => {
+    alert("¡Gracias por tu compra! Tu pedido será enviado a: " + direccion);
+    carrito = [];
+    actualizarCarrito();
+    document.getElementById("carrito").classList.add("hidden");
+  }, 500);
+}
+
+function cambiarCantidad(index, nuevaCantidad) {
+  nuevaCantidad = parseInt(nuevaCantidad);
+  if (nuevaCantidad > 0) {
+    carrito[index].cantidad = nuevaCantidad;
+    actualizarCarrito();
+  }
+}
+
+function eliminarDelCarrito(index) {
+  carrito.splice(index, 1);
+  actualizarCarrito();
+}
+
+function toggleCarrito() {
+  const carritoPanel = document.getElementById("carrito");
+  carritoPanel.classList.toggle("hidden");
+}
+
+function mostrarNotificacion() {
+  const noti = document.getElementById("notificacion");
+  noti.style.display = "block";
+  setTimeout(() => {
+    noti.style.display = "none";
+  }, 2000);
+}
+</script>
+</body>
+</html>
